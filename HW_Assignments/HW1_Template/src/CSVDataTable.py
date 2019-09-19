@@ -1,3 +1,4 @@
+from collections import OrderedDict
 
 from src.BaseDataTable import BaseDataTable
 import copy
@@ -91,6 +92,11 @@ class CSVDataTable(BaseDataTable):
         Write the information back to a file.
         :return: None
         """
+        with open("{}.csv".format(self._data["table_name"]), 'w') as db:
+            csv_d_wtr = csv.DictWriter(db)
+            for row in self._rows:
+                csv_d_wtr.writerow(row)
+
 
     @staticmethod
     def matches_template(row, template):
@@ -112,7 +118,17 @@ class CSVDataTable(BaseDataTable):
         :return: None, or a dictionary containing the requested fields for the record identified
             by the key.
         """
-        pass
+        if not self._data["key_columns"]:
+            raise Exception("no primary key defined")
+
+        if len(key_fields) != len(self._data["key_columns"]):
+            raise Exception("expected {} fields for primary key, got {}".format(len(self._data["key_columns"])),
+                                                                               len(key_fields))
+
+        template = dict(zip(self._data["key_columns"], key_fields))
+
+        return self.find_by_template(template, field_list)
+
 
     def find_by_template(self, template, field_list=None, limit=None, offset=None, order_by=None):
         """
@@ -125,17 +141,41 @@ class CSVDataTable(BaseDataTable):
         :return: A list containing dictionaries. A dictionary is in the list representing each record
             that matches the template. The dictionary only contains the requested fields.
         """
-        pass
+        matches = list()
+        for row in self._rows:
+            if CSVDataTable.matches_template(row, template):
+                if field_list:
+                    row_request = OrderedDict()
+                    for f in field_list:
+                        field_val = row.get(f, None)
+                        if field_val is None:
+                            raise Exception("invalid field: {}".format(f))
+                        else:
+                            row_request[f] = field_val
+                    matches.append(row_request)
+                else:
+                    matches.append(row)
+
+        return matches
 
     def delete_by_key(self, key_fields):
         """
 
         Deletes the record that matches the key.
 
-        :param template: A template.
+        :param key_fields: The list with the values for the key_columns, in order, to use to find a record.
         :return: A count of the rows deleted.
         """
-        pass
+        if not self._data["key_columns"]:
+            raise Exception("no primary key defined")
+
+        if len(key_fields) != len(self._data["key_columns"]):
+            raise Exception("expected {} fields for primary key, got {}".format(len(self._data["key_columns"])),
+                                                                               len(key_fields))
+
+        template = dict(zip(self._data["key_columns"], key_fields))
+
+        return self.delete_by_template(template)
 
     def delete_by_template(self, template):
         """
@@ -143,7 +183,16 @@ class CSVDataTable(BaseDataTable):
         :param template: Template to determine rows to delete.
         :return: Number of rows deleted.
         """
-        pass
+        new_rows = list()
+        num_deleted = 0
+        for row in self._rows:
+            if CSVDataTable.matches_template(row, template):
+                num_deleted += 1
+            else:
+                new_rows.append(row)
+        self._rows = new_rows
+
+        return num_deleted
 
     def update_by_key(self, key_fields, new_values):
         """
@@ -152,6 +201,17 @@ class CSVDataTable(BaseDataTable):
         :param new_values: A dict of field:value to set for updated row.
         :return: Number of rows updated.
         """
+        if not self._data["key_columns"]:
+            raise Exception("no primary key defined")
+
+        if len(key_fields) != len(self._data["key_columns"]):
+            raise Exception("expected {} fields for primary key, got {}".format(len(self._data["key_columns"])),
+                                                                               len(key_fields))
+
+        template = dict(zip(self._data["key_columns"], key_fields))
+
+        return self.update_by_template(template, new_values)
+
 
     def update_by_template(self, template, new_values):
         """
@@ -160,7 +220,13 @@ class CSVDataTable(BaseDataTable):
         :param new_values: New values to set for matching fields.
         :return: Number of rows updated.
         """
-        pass
+        matches = self.find_by_template(template)
+        for m in matches:
+            for k,v in new_values.values():
+                m[k] = v
+
+        return len(matches)
+
 
     def insert(self, new_record):
         """
@@ -168,7 +234,8 @@ class CSVDataTable(BaseDataTable):
         :param new_record: A dictionary representing a row to add to the set of records.
         :return: None
         """
-        pass
+        if len(self.find_by_template(new_record)) == 0:
+            self.insert(new_record)
 
     def get_rows(self):
         return self._rows
