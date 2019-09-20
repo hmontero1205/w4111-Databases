@@ -30,7 +30,4 @@ def t_load():
     print("Created table = " + str(csv_tbl))
 
 
-    print(csv_tbl.find_by_template({"birthYear":"1981"}, ["nameGiven"]))
-
-
 t_load()

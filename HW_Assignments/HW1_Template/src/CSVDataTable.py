@@ -222,9 +222,23 @@ class CSVDataTable(BaseDataTable):
         :return: Number of rows updated.
         """
         matches = self.find_by_template(template)
+        check_conflict = False
+        p_keys = set(self._data["key_columns"])
+        if self._data["key_columns"] is not None:
+            n_keys = set(new_values.keys())
+            if p_keys.intersection(n_keys) == p_keys:
+                check_conflict = True
         for m in matches:
-            for k,v in new_values.values():
-                m[k] = v
+            primary_vals = list()
+            new_m = OrderedDict(m)
+            for k,v in new_values.items():
+                if k in p_keys:
+                    primary_vals.append(v)
+                new_m[k] = v
+            if check_conflict:
+                if len(self.find_by_primary_key(primary_vals)) != 0:
+                    raise Exception("ERROR: row already exists with primary key vals {}".format(primary_vals))
+            m.update(new_m)
 
         return len(matches)
 
@@ -236,7 +250,18 @@ class CSVDataTable(BaseDataTable):
         :return: None
         """
         if len(self.find_by_template(new_record)) == 0:
-            self.insert(new_record)
+            n_keys = set(new_record.keys())
+            p_keys = set(self._data["key_columns"])
+            int_keys = n_keys.intersection(p_keys)
+            if int_keys != p_keys:
+                raise Exception("missing primary keys {}".format(p_keys.difference(int_keys)))
+
+            p_key_vals = [new_record[k] for k in p_keys]
+            exist_query = self.find_by_primary_key(p_key_vals)
+            if len(exist_query) != 0:
+                raise Exception("ERROR: found row with conflicting primary keys: {}".format(exist_query))
+
+            self._rows.append(new_record)
 
     def get_rows(self):
         return self._rows
