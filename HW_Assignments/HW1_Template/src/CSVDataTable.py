@@ -92,10 +92,11 @@ class CSVDataTable(BaseDataTable):
         Write the information back to a file.
         :return: None
         """
-        with open("{}.csv".format(self._data["table_name"]), 'w') as db:
-            csv_d_wtr = csv.DictWriter(db)
-            for row in self._rows:
-                csv_d_wtr.writerow(row)
+        if len(self._rows) > 0:
+            with open("{}.csv".format(self._data["table_name"]), 'w') as db:
+                csv_d_wtr = csv.DictWriter(db, self._rows[0].keys())
+                for row in self._rows:
+                    csv_d_wtr.writerow(row)
 
 
     @staticmethod
@@ -122,8 +123,8 @@ class CSVDataTable(BaseDataTable):
             raise Exception("no primary key defined")
 
         if len(key_fields) != len(self._data["key_columns"]):
-            raise Exception("expected {} fields for primary key, got {}".format(len(self._data["key_columns"])),
-                                                                               len(key_fields))
+            raise Exception("expected {} field(s) for primary key, got {}".format(len(self._data["key_columns"]),
+                                                                               len(key_fields)))
 
         template = dict(zip(self._data["key_columns"], key_fields))
 
@@ -170,8 +171,8 @@ class CSVDataTable(BaseDataTable):
             raise Exception("no primary key defined")
 
         if len(key_fields) != len(self._data["key_columns"]):
-            raise Exception("expected {} fields for primary key, got {}".format(len(self._data["key_columns"])),
-                                                                               len(key_fields))
+            raise Exception("expected {} field(s) for primary key, got {}".format(len(self._data["key_columns"]),
+                                                                               len(key_fields)))
 
         template = dict(zip(self._data["key_columns"], key_fields))
 
@@ -205,8 +206,8 @@ class CSVDataTable(BaseDataTable):
             raise Exception("no primary key defined")
 
         if len(key_fields) != len(self._data["key_columns"]):
-            raise Exception("expected {} fields for primary key, got {}".format(len(self._data["key_columns"])),
-                                                                               len(key_fields))
+            raise Exception("expected {} field(s) for primary key, got {}".format(len(self._data["key_columns"]),
+                                                                               len(key_fields)))
 
         template = dict(zip(self._data["key_columns"], key_fields))
 
