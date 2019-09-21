@@ -3,7 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="b12d6f8e-1e9c-409f-b507-d967c9fcb1fd" name="Default" comment="Cleaned up the directory.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HW_Assignments/HW1_Template/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/HW_Assignments/HW1_Template/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HW_Assignments/HW1_Template/tests/csv_table_tests.py" beforeDir="false" afterPath="$PROJECT_DIR$/HW_Assignments/HW1_Template/tests/csv_table_tests.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -286,7 +286,7 @@
       <workItem from="1565900682678" duration="9000" />
       <workItem from="1565910391322" duration="643000" />
       <workItem from="1568909387540" duration="21097000" />
-      <workItem from="1569026121739" duration="13723000" />
+      <workItem from="1569026121739" duration="14374000" />
     </task>
     <task id="LOCAL-00001" summary="Moved content">
       <created>1545233951773</created>

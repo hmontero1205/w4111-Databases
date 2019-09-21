@@ -13,6 +13,7 @@ clause that the row must match. "Fields" are just column names specified in the 
 If no fields are specified, the statement is equivalent to `SELECT * ...`.
 
 **DESIGN CHOICES**
+- I made `HW1_Template` the root of my PyCharm project.
 - CSVDataTable's `_add_row()` method was left as it was in the original template.
 It would simply take forever to perform integrity checks with it since we are reading in relatively large CSV files.
     - Instead, `insert()` performs the necessary integrity checks (row contains valid primary key, no dups, etc).

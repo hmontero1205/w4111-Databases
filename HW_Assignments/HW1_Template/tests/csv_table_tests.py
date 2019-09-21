@@ -30,7 +30,7 @@ def test_find_by_primary_key(db):
     except Exception as e:
         print("error thrown as expected: {}".format(e))
     print("asserting field_list filtering works...")
-    player_result3 = db.find_by_primary_key(["aardsda01"], ["nameFirst", "nameLast", "birthCity"])
+    player_result3 = db.find_by_primary_key(["aardsda01"], field_list=["nameFirst", "nameLast", "birthCity"])
     assert(len(player_result3) == 1)
     assert(len(player_result3[0].keys()) == 3)
 
@@ -47,7 +47,7 @@ def test_find_by_template(db):
             assert(p[k] == v)
 
     print("testing template search with field_list defined and asserting result length same as previous....")
-    res2 = db.find_by_template(template, ["birthYear"])
+    res2 = db.find_by_template(template, field_list=["birthYear"])
     assert(len(res2) == len(res1))
 
     print("asserting that non-existent field in field_list throws error....")

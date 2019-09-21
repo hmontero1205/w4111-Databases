@@ -19,7 +19,7 @@ def test_find_by_primary_key(db):
     except Exception as e:
         print("error thrown as expected: {}".format(e))
     print("asserting field_list filtering works...")
-    player_result3 = db.find_by_primary_key(["aardsda01"], ["nameFirst", "nameLast", "birthCity"])
+    player_result3 = db.find_by_primary_key(["aardsda01"], field_list=["nameFirst", "nameLast", "birthCity"])
     assert(len(player_result3) == 1)
     assert(len(player_result3[0].keys()) == 3)
 
