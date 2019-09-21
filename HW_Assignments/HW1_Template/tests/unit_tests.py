@@ -2,32 +2,14 @@
 # This file contains unit tests of individual methods.
 
 from src.CSVDataTable import CSVDataTable
-import logging
+from src.RDBDataTable import RDBDataTable
+import tests.csv_table_tests
+import tests.rdb_table_tests
 import os
 
+def run_all_tests():
+    tests.csv_table_tests.run_tests()
+    tests.rdb_table_tests.run_tests()
 
-# The logging level to use should be an environment variable, not hard coded.
-logging.basicConfig(level=logging.DEBUG)
-
-# Also, the 'name' of the logger to use should be an environment variable.
-logger = logging.getLogger()
-logger.setLevel(logging.DEBUG)
-
-# This should also be an environment variable.
-# Also not the using '/' is OS dependent, and windows might need `\\`
-data_dir = os.path.abspath("../Data/Baseball")
-
-
-def t_load():
-
-    connect_info = {
-        "directory": data_dir,
-        "file_name": "People.csv"
-    }
-
-    csv_tbl = CSVDataTable("people", connect_info, None)
-
-    print("Created table = " + str(csv_tbl))
-
-
-t_load()
+if __name__ == "__main__":
+    run_all_tests()

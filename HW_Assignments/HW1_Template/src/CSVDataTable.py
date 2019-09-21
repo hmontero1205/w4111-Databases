@@ -249,7 +249,8 @@ class CSVDataTable(BaseDataTable):
         :param new_record: A dictionary representing a row to add to the set of records.
         :return: None
         """
-        if len(self.find_by_template(new_record)) == 0:
+        existing = self.find_by_template(new_record)
+        if len(existing) == 0:
             n_keys = set(new_record.keys())
             p_keys = set(self._data["key_columns"])
             int_keys = n_keys.intersection(p_keys)
@@ -262,6 +263,8 @@ class CSVDataTable(BaseDataTable):
                 raise Exception("ERROR: found row with conflicting primary keys: {}".format(exist_query))
 
             self._rows.append(new_record)
+        else:
+            raise Exception("duplicate entry found: {}".format(existing))
 
     def get_rows(self):
         return self._rows

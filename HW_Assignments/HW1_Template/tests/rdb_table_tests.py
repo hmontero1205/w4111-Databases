@@ -1,18 +1,7 @@
+import getpass
 from collections import OrderedDict
 
-from src.CSVDataTable import CSVDataTable
-import os
-
-data_dir = os.path.abspath("../Data/Baseball")
-
-def test_load(db):
-    print("****running test_load****")
-
-    print("asserting table and rows are not None...")
-    assert(db is not None)
-    assert(db.get_rows() is not None)
-
-    print("****test_load succeeded!****\n")
+from src.RDBDataTable import RDBDataTable
 
 def test_find_by_primary_key(db):
     print("****running test_find_by_primary_key****")
@@ -65,25 +54,28 @@ def test_find_by_template(db):
 def test_delete_by_key():
     print("****running test_delete_by_key****")
     connect_info = {
-        "directory": data_dir,
-        "file_name": "People.csv"
+        "host": "localhost",
+        "user": "root",
+        "password": "test123",
+        "database": "lahman_2019",
+        "charset": "utf8mb4"
     }
-    csv_tbl = CSVDataTable("people", connect_info, ["playerID"])
-    before_count = len(csv_tbl.get_rows())
-    delete_count = csv_tbl.delete_by_key(["abbeybe01"])
-    after_count = len(csv_tbl.get_rows())
+    rdb_tbl = RDBDataTable("People", connect_info, ["playerID"], commit=False)
+    before_count = len(rdb_tbl.get_rows())
+    delete_count = rdb_tbl.delete_by_key(["abbeybe01"])
+    after_count = len(rdb_tbl.get_rows())
     print("asserting valid delete removed 1 row...")
     assert(delete_count == 1)
     assert(before_count == after_count + 1)
 
-    delete_count2 = csv_tbl.delete_by_key(["hjm2133"])
-    after_count2 = len(csv_tbl.get_rows())
+    delete_count2 = rdb_tbl.delete_by_key(["hjm2133"])
+    after_count2 = len(rdb_tbl.get_rows())
     print("asserting invalid delete removed 0 rows...")
     assert(delete_count2 == 0)
     assert(after_count == after_count2)
 
     print("asserting search for deleted primary key returns nothing...")
-    empty_query = csv_tbl.find_by_primary_key(["abbeybe01"])
+    empty_query = rdb_tbl.find_by_primary_key(["abbeybe01"])
     assert(len(empty_query) == 0)
 
     print("****test_delete_by_key succeeded!****\n")
@@ -91,24 +83,27 @@ def test_delete_by_key():
 def test_delete_by_template():
     print("****running test_delete_find_by_template****")
     connect_info = {
-        "directory": data_dir,
-        "file_name": "People.csv"
+        "host": "localhost",
+        "user": "root",
+        "password": "test123",
+        "database": "lahman_2019",
+        "charset": "utf8mb4"
     }
-    csv_tbl = CSVDataTable("people", connect_info, ["playerID"])
-    before_count = len(csv_tbl.get_rows())
+    rdb_tbl = RDBDataTable("People", connect_info, ["playerID"], commit=False)
+    before_count = len(rdb_tbl.get_rows())
     template = {"playerID":"barbeja01", "birthYear":"1882"}
-    delete_count = csv_tbl.delete_by_template(template)
-    after_count = len(csv_tbl.get_rows())
+    delete_count = rdb_tbl.delete_by_template(template)
+    after_count = len(rdb_tbl.get_rows())
     print("asserting valid delete removed correct number of rows...")
     assert(delete_count == 1)
     assert(before_count == after_count + 1)
     print("asserting that query for deleted template returns nothing...")
-    empty_query = csv_tbl.find_by_template(template)
+    empty_query = rdb_tbl.find_by_template(template)
     assert(len(empty_query) == 0)
 
     template2 = {"playerID": "bardda01", "birthYear": "1999"}
-    delete_count2 = csv_tbl.delete_by_template(template2)
-    after_count2 = len(csv_tbl.get_rows())
+    delete_count2 = rdb_tbl.delete_by_template(template2)
+    after_count2 = len(rdb_tbl.get_rows())
     print("asserting invalid delete removed 0 rows...")
     assert(delete_count2 == 0)
     assert(after_count == after_count2)
@@ -117,24 +112,27 @@ def test_delete_by_template():
 def test_update_by_key():
     print("****running test_update_by_key****")
     connect_info = {
-        "directory": data_dir,
-        "file_name": "People.csv"
+        "host": "localhost",
+        "user": "root",
+        "password": "test123",
+        "database": "lahman_2019",
+        "charset": "utf8mb4"
     }
-    csv_tbl = CSVDataTable("people", connect_info, ["playerID"])
+    rdb_tbl = RDBDataTable("People", connect_info, ["playerID"], commit=False)
 
     new_vals = {"birthYear":"1999", "nameFirst":"Hans", "playerID":"hjm2133"}
-    updated = csv_tbl.update_by_key(["barbest02"], new_vals)
+    updated = rdb_tbl.update_by_key(["barbest02"], new_vals)
     print("asserting only 1 row updated...")
     assert(updated == 1)
     print("asserting that the row's values were updated....")
-    for r in csv_tbl.find_by_primary_key(["barbest02"]):
+    for r in rdb_tbl.find_by_primary_key(["barbest02"]):
         for k,v in new_vals.items():
             assert(r[k] == v)
 
     print("asserting that an update that produces conflicting primary key fails..")
     new_vals2 = {"playerID": "hjm2133", "nameLast": "Montero"}
     try:
-        csv_tbl.update_by_key(["abbotda01"], new_vals2)
+        rdb_tbl.update_by_key(["abbotda01"], new_vals2)
         print("ERROR: updated another row to have repeated primary key")
         assert (False)
     except AssertionError:
@@ -147,18 +145,21 @@ def test_update_by_key():
 def test_update_by_template():
     print("****running test_update_by_template***")
     connect_info = {
-        "directory": data_dir,
-        "file_name": "People.csv"
+        "host": "localhost",
+        "user": "root",
+        "password": "test123",
+        "database": "lahman_2019",
+        "charset": "utf8mb4"
     }
-    csv_tbl = CSVDataTable("people", connect_info, ["playerID"])
+    rdb_tbl = RDBDataTable("People", connect_info, ["playerID"], commit=False)
 
     new_vals = {"birthYear":"1999", "nameFirst":"Hans", "playerID":"hjm2133"}
     template = {"playerID":"abadfe01", "birthCountry":"D.R."}
-    updated = csv_tbl.update_by_template(template, new_vals)
+    updated = rdb_tbl.update_by_template(template, new_vals)
     print("asserting correct number of rows updated...")
     assert(updated == 1)
     print("asserting that the row's values were updated....")
-    for r in csv_tbl.find_by_template(template):
+    for r in rdb_tbl.find_by_template(template):
         for k,v in new_vals.items():
             assert(r[k] == v)
 
@@ -166,7 +167,7 @@ def test_update_by_template():
     new_vals2 = {"playerID":"hjm2133", "nameLast":"Montero"}
     template2 = {"birthCountry":"D.R."}
     try:
-        csv_tbl.update_by_template(template2, new_vals2)
+        rdb_tbl.update_by_template(template2, new_vals2)
         print("ERROR: updated several rows to have same primary key")
         assert(False)
     except AssertionError:
@@ -178,28 +179,31 @@ def test_update_by_template():
 def test_insert():
     print("****running test_insert***")
     connect_info = {
-        "directory": data_dir,
-        "file_name": "People.csv"
+        "host": "localhost",
+        "user": "root",
+        "password": "test123",
+        "database": "lahman_2019",
+        "charset": "utf8mb4"
     }
-    csv_tbl = CSVDataTable("people", connect_info, ["playerID"])
+    rdb_tbl = RDBDataTable("People", connect_info, ["playerID"], commit=False)
 
-    old_row = csv_tbl.find_by_primary_key(["aardsda01"])[0]
+    old_row = rdb_tbl.find_by_primary_key(["aardsda01"])[0]
     new_row = dict(old_row)
     new_row["playerID"] = "hjm2133"
 
-    before_count = len(csv_tbl.get_rows())
+    before_count = len(rdb_tbl.get_rows())
     print("asserting that a new row insert increases row count by 1....")
-    csv_tbl.insert(new_row)
-    after_count = len(csv_tbl.get_rows())
+    rdb_tbl.insert(new_row)
+    after_count = len(rdb_tbl.get_rows())
     assert(after_count == before_count + 1)
 
     print("asserting that a duplicate row insert throws error...")
     try:
-        csv_tbl.insert(new_row)
+        rdb_tbl.insert(new_row)
         print("ERROR: dup row inserted!!")
-        assert(False)
+        assert (False)
     except AssertionError:
-        assert(False)
+        assert (False)
     except Exception as e:
         print("error thrown as expected: {}".format(e))
 
@@ -208,7 +212,7 @@ def test_insert():
     no_prim_key["birthYear"] = "1999"
     no_prim_key["nameFirst"] = "Hans"
     try:
-        csv_tbl.insert(no_prim_key)
+        rdb_tbl.insert(no_prim_key)
         print("ERROR: row without primary key inserted!")
         assert(False)
     except AssertionError:
@@ -221,7 +225,7 @@ def test_insert():
     conf_prim_key["playerID"] = "barthji01"
     conf_prim_key["birthYear"] = "1999"
     try:
-        csv_tbl.insert(conf_prim_key)
+        rdb_tbl.insert(conf_prim_key)
         print("ERROR: row with conflicting primary key inserted!")
         assert(False)
     except AssertionError:
@@ -234,13 +238,15 @@ def test_insert():
 
 def run_tests():
     connect_info = {
-        "directory": data_dir,
-        "file_name": "People.csv"
+        "host": "localhost",
+        "user": "root",
+        "password": "test123",
+        "database": "lahman_2019",
+        "charset": "utf8mb4"
     }
-    csv_tbl = CSVDataTable("people", connect_info, ["playerID"])
-    test_load(csv_tbl)
-    test_find_by_primary_key(csv_tbl)
-    test_find_by_template(csv_tbl)
+    db = RDBDataTable("People", connect_info, ["playerID"], commit=False)
+    test_find_by_primary_key(db)
+    test_find_by_template(db)
     test_delete_by_key()
     test_delete_by_template()
     test_update_by_key()
